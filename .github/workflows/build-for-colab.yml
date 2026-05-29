@@ -52,7 +52,7 @@ jobs:
     - name: 7. 启动 Tauri 核心编译 (专属适配 Colab T4 显卡跳过安装包打包与签名) 
       env:
         CUDA_COMPUTE_CAP: 75 
-      run: bun tauri build --bundles none
+      run: bun tauri build --no-bundle
 
     - name: 8. 提取成品并打包下载
       uses: actions/upload-artifact@v4
