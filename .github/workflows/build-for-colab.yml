@@ -58,5 +58,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: koharu_custom
-        path: src-tauri/target/release/koharu 
+        path: target/release/koharu 
         retention-days: 7
