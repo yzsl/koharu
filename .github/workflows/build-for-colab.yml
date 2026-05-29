@@ -14,28 +14,36 @@ jobs:
     - name: 1. 拉取源代码
       uses: actions/checkout@v4
 
-    - name: 2. 安装 Ubuntu 22.04 系统级编译依赖 (含 CUDA)
+    - name: 2. 安装 Ubuntu 基础编译依赖 (移除旧版 CUDA)
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake llvm clang pkg-config libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libwebkit2gtk-4.1-dev libvulkan-dev nvidia-cuda-toolkit
+        sudo apt-get install -y build-essential cmake llvm clang pkg-config libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libwebkit2gtk-4.1-dev libvulkan-dev
 
-    - name: 3. 配置 Rust 环境
+    - name: 3. 安装最新版 CUDA Toolkit 12.2 (解决 fp8 缺失问题)
+      uses: Jimver/cuda-toolkit@v0.2.18
+      id: cuda-toolkit
+      with:
+        cuda: '12.2.0'
+
+    - name: 4. 配置 Rust 环境
       uses: actions-rust-lang/setup-rust-toolchain@v1
       with:
         toolchain: stable
 
-    - name: 4. 配置 Bun 环境
+    - name: 5. 配置 Bun 环境
       uses: oven-sh/setup-bun@v1
       with:
         bun-version: latest
 
-    - name: 5. 安装前端依赖
+    - name: 6. 安装前端依赖
       run: bun install
 
-    - name: 6. 启动 Tauri 核心编译 (由于加入 CUDA，耗时会更长)
+    - name: 7. 启动 Tauri 核心编译 (专属适配 Colab T4 显卡)
+      env:
+        CUDA_COMPUTE_CAP: 75  # 极其关键：告诉编译器这是给 Colab T4 (sm_75) 显卡用的，避免架构不兼容
       run: bun tauri build
 
-    - name: 7. 提取成品并打包下载
+    - name: 8. 提取成品并打包下载
       uses: actions/upload-artifact@v4
       with:
         name: koharu_custom
