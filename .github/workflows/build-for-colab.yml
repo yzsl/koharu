@@ -1,21 +1,23 @@
 name: Build Koharu for Colab
 
-# 允许手动点击按钮触发编译
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   workflow_dispatch: 
 
 jobs:
   build:
-    runs-on: ubuntu-22.04 # 核心：强制使用与 Colab 完全一致的系统环境
+    runs-on: ubuntu-22.04
 
     steps:
     - name: 1. 拉取源代码
       uses: actions/checkout@v4
 
-    - name: 2. 安装 Ubuntu 22.04 系统级编译依赖
+    - name: 2. 安装 Ubuntu 22.04 系统级编译依赖 (含 CUDA)
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake llvm clang pkg-config libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libwebkit2gtk-4.1-dev libvulkan-dev
+        sudo apt-get install -y build-essential cmake llvm clang pkg-config libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libwebkit2gtk-4.1-dev libvulkan-dev nvidia-cuda-toolkit
 
     - name: 3. 配置 Rust 环境
       uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -30,13 +32,12 @@ jobs:
     - name: 5. 安装前端依赖
       run: bun install
 
-    - name: 6. 启动 Tauri 核心编译 (耗时较长，请耐心等待)
+    - name: 6. 启动 Tauri 核心编译 (由于加入 CUDA，耗时会更长)
       run: bun tauri build
 
     - name: 7. 提取成品并打包下载
       uses: actions/upload-artifact@v4
       with:
-        name: koharu_custom # 你最终下载的压缩包名称
-        # 提取编译好的绿色二进制文件
+        name: koharu_custom
         path: src-tauri/target/release/koharu 
-        retention-days: 7 # 在服务器上保留 7 天
+        retention-days: 7
