@@ -14,12 +14,23 @@ jobs:
     - name: 1. 拉取源代码
       uses: actions/checkout@v4
 
-    - name: 2. 安装 Ubuntu 基础编译依赖 (移除旧版 CUDA)
+    - name: 1.5 强力清理磁盘空间 (为 CUDA 腾出几十GB空间)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: false
+        android: true    # 删掉几GB的安卓开发包
+        dotnet: true     # 删掉没用的微软.NET环境
+        haskell: true    # 删掉不用的语言包
+        large-packages: false
+        docker-images: true # 删掉预装的笨重Docker镜像
+        swap-storage: false
+
+    - name: 2. 安装 Ubuntu 基础编译依赖
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential cmake llvm clang pkg-config libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libwebkit2gtk-4.1-dev libvulkan-dev
 
-    - name: 3. 安装最新版 CUDA Toolkit 12.2 (解决 fp8 缺失问题)
+    - name: 3. 安装最新版 CUDA Toolkit 12.2 (解决 fp8 问题)
       uses: Jimver/cuda-toolkit@v0.2.18
       id: cuda-toolkit
       with:
@@ -40,7 +51,7 @@ jobs:
 
     - name: 7. 启动 Tauri 核心编译 (专属适配 Colab T4 显卡)
       env:
-        CUDA_COMPUTE_CAP: 75  # 极其关键：告诉编译器这是给 Colab T4 (sm_75) 显卡用的，避免架构不兼容
+        CUDA_COMPUTE_CAP: 75 
       run: bun tauri build
 
     - name: 8. 提取成品并打包下载
