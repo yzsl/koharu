@@ -14,7 +14,7 @@ jobs:
     - name: 1. 拉取源代码
       uses: actions/checkout@v4
       with:
-        fetch-tags: true  # 只把轻量级的版本标签全拉下来，不拉取深层历史代码
+        fetch-depth: 0  # 👈 新增这一行：强制拉取所有历史记录和版本标签
 
     - name: 1.5 强力清理磁盘空间 (为 CUDA 腾出几十GB空间)
       uses: jlumbroso/free-disk-space@main
