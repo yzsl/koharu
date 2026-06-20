@@ -14,7 +14,8 @@ jobs:
     - name: 1. 拉取源代码
       uses: actions/checkout@v4
       with:
-        ref: v0.49.0   # 👈 核心修改：精准拉取 0.49.0 版本的历史代码
+        repository: mayocream/koharu   # 👈 新增这行：直接告诉机器去原作者的仓库拿代码
+        ref: v0.49.0                   # 👈 保持这行：精确锁定 0.49.0 版本
       
 
 
