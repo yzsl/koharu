@@ -13,9 +13,10 @@ jobs:
     steps:
     - name: 1. 拉取源代码
       uses: actions/checkout@v4
+      with:
+        ref: v0.49.0   # 👈 核心修改：精准拉取 0.49.0 版本的历史代码
       
-    - name: 1.1 手动强行打上版本号标签 (终极解决版本号问题)
-      run: git tag v0.61.1   # 👈 你想要什么版本号，这里就写什么！
+
 
 
     - name: 1.5 强力清理磁盘空间 (为 CUDA 腾出几十GB空间)
